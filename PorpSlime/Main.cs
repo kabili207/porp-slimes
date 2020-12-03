@@ -102,6 +102,7 @@ namespace PorpSlime
             //porpSlimeObject.GetComponent<Rigidbody>().mass = 100f;
             //porpSlimeObject.GetComponent<Vacuumable>().size = Vacuumable.Size.NORMAL;
             porpSlimeObject.GetComponent<Identifiable>().id = PorpId.PORP_SLIME;
+            porpSlimeObject.AddComponent<ForcePorp>();
 
             SlimeAppearance porpSlimeAppearance = PrefabUtils.DeepCopyObject(pinkSlimeObject.AppearancesDefault.First()) as SlimeAppearance;
             porpDef.AppearancesDefault[0] = porpSlimeAppearance;
@@ -225,7 +226,8 @@ namespace PorpSlime
         {
             foreach (GameObject identifiablePrefab in SRSingleton<GameContext>.Instance.LookupDirector.identifiablePrefabs)
             {
-                if (Identifiable.IsSlime(Identifiable.GetId(identifiablePrefab)))
+                var id = Identifiable.GetId(identifiablePrefab);
+                if (Identifiable.IsSlime(id) && id != PorpId.PORP_SLIME)
                     identifiablePrefab.AddComponent<PorpSpawn>();
             }
 

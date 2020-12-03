@@ -91,6 +91,17 @@ namespace PorpSlime
             }
         }
 
+        public void SetSkin(Skin skin)
+        {
+            this.skin = skin;
+            didGetSet = true;
+            switch (skin)
+            {
+                case Skin.Porp:
+                    Shinify();
+                    break;
+            }
+        }
 
         public void ReadData(CompoundDataPiece piece)
         {
@@ -187,11 +198,6 @@ namespace PorpSlime
 
         public void Shinify()
         {
-            Identifiable.Id id = Identifiable.GetId(gameObject);
-            var idName = Enum.GetName(typeof(Identifiable.Id), id);
-            var skinName = Enum.GetName(typeof(Skin), skin);
-            Debug.Log($"Set {idName} with {skinName} skin");
-
             SetDiet();
             switch (Identifiable.GetId(gameObject))
             {
@@ -227,26 +233,6 @@ namespace PorpSlime
             }
         }
 
-        [HarmonyPatch(typeof(SlimeEat), "FinishChomp")]
-        internal static class FinishChompPatch
-        {
-            public static void Prefix(SlimeEat __instance)
-            {
-                Identifiable.Id id = Identifiable.GetId(__instance.gameObject);
-                PorpSpawn porp = __instance.gameObject.GetComponent<PorpSpawn>();
-                var idName = Enum.GetName(typeof(Identifiable.Id), id);
-                var skinName = Enum.GetName(typeof(Skin), porp.skin);
-                if (porp != null)
-                    Debug.Log($"Chomping {idName} with {skinName} skin");
-
-                if (id == PorpId.PORP_SLIME && porp is null)
-                {
-                    porp = __instance.gameObject.AddComponent<PorpSpawn>();
-                    porp.skin = Skin.Porp;
-                }
-            }
-        }
-
         [HarmonyPatch(typeof(SlimeEat))]
         [HarmonyPatch("EatAndTransform")]
         public static class PorpPersistance
@@ -255,81 +241,9 @@ namespace PorpSlime
             {
                 Identifiable.Id id = Identifiable.GetId(__instance.gameObject);
                 var idName = Enum.GetName(typeof(Identifiable.Id), id);
-
-                if (id == PorpId.PORP_SLIME)
-                    DefaultSkin = Skin.Porp;
-                else
-                    DefaultSkin = __instance.gameObject.GetComponent<PorpSpawn>().skin;
-
+                DefaultSkin = __instance.gameObject.GetComponent<PorpSpawn>().skin;
                 var skinName = Enum.GetName(typeof(Skin), DefaultSkin);
                 Debug.Log($"Transforming {idName} with {skinName} skin");
-            }
-        }
-
-        [HarmonyPatch(typeof(SlimeEat), "CalculateAllEats")]
-        public static class PorpCalculateEatsPatch
-        {
-            private static SlimeDiet _porpDiet = null;
-            private static SlimeDefinition _porpSlimeDef = new SlimeDefinition()
-            {
-                CanLargofy = false,
-                IsLargo = false
-            };
-
-            private static void EnsurePorpDiet()
-            {
-                if (_porpDiet is null)
-                {
-                    _porpDiet = new SlimeDiet()
-                    {
-                        Produces = new[] { PorpId.PORP_PLORT },
-                        MajorFoodGroups = new[] { SlimeEat.FoodGroup.MEAT },
-                        AdditionalFoods = new Identifiable.Id[0],
-                        Favorites = new[] { Identifiable.Id.HEN }
-                    };
-                    _porpSlimeDef.Diet = _porpDiet;
-                    _porpDiet.RefreshEatMap(SRSingleton<GameContext>.Instance.SlimeDefinitions, _porpSlimeDef);
-                }
-            }
-
-            public static void Postfix(SlimeEat __instance)
-            {
-                PlayerState playerState = SRSingleton<SceneContext>.Instance?.PlayerState;
-                PorpSpawn spawn = __instance.gameObject.GetComponent<PorpSpawn>();
-                if (playerState is null || spawn is null || spawn.skin != Skin.Porp)
-                    return;
-
-                EnsurePorpDiet();
-
-                List<SlimeDiet.EatMapEntry> eatMap = _porpDiet.EatMap;
-                __instance.allEats.Clear();
-
-                for (int index = 0; index < eatMap.Count; ++index)
-                {
-                    if (!SRSingleton<SceneContext>.Instance.GameModeConfig.GetModeSettings().preventHostiles || !Identifiable.IsTarr(eatMap[index].becomesId))
-                    {
-                        float num = eatMap[index].eats == Identifiable.Id.HONEY_PLORT ? 0.5f : 0.0f;
-                        __instance.allEats[eatMap[index].eats] = new DriveCalculator(eatMap[index].driver, eatMap[index].extraDrive + num, eatMap[index].minDrive);
-                    }
-                }
-            }
-        }
-
-        [HarmonyPatch(typeof(DirectedSlimeSpawner), "MaybeReplacePrefab")]
-        public static class PorpSlimeSpawnPatch
-        {
-            public static GameObject Postfix(GameObject prefab, DirectedSlimeSpawner __instance)
-            {
-                var region = __instance.GetComponentInParent<Region>();
-                var regionSet = region.GetZoneId();
-                var lookupDir = SRSingleton<GameContext>.Instance.LookupDirector;
-                /*switch (region.GetZoneId())
-                {
-                    case ZoneDirector.Zone.QUARRY:
-                        return Randoms.SHARED.GetProbability(PorpSpawn.PROBABILITY_PORP) ? lookupDir.GetPrefab(PorpId.PORP_SLIME) : prefab;
-                }*/
-                return prefab;
-
             }
         }
     }
