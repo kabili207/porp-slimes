@@ -54,7 +54,6 @@ namespace PorpSlime
                 RaycastHit hitInfo;
                 if (Physics.Raycast(new Ray(Camera.main.transform.position, Camera.main.transform.forward), out hitInfo))
                 {
-                    PorpSpawn.DefaultSkin = skin;
                     GameObject gameObject = SRBehaviour.InstantiateActor(prefab, SRSingleton<SceneContext>.Instance.Player.GetComponent<RegionMember>().setId, true);
                     gameObject.transform.position = hitInfo.point + hitInfo.normal * PhysicsUtil.CalcRad(gameObject.GetComponent<Collider>());
                     Vector3 vector3_1 = hitInfo.point - Camera.main.transform.position;
@@ -62,6 +61,7 @@ namespace PorpSlime
                     vector3_1 = vector3_2 - Vector3.Project(vector3_2, hitInfo.normal);
                     Vector3 normalized = vector3_1.normalized;
                     gameObject.transform.rotation = Quaternion.LookRotation(vector3_2, hitInfo.normal);
+                    gameObject.GetComponent<PorpSpawn>().SetSkin(skin);
                 }
             }
             return true;

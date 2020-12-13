@@ -63,8 +63,6 @@ namespace PorpSlime
                     "Look, it's porp. Everyone wants porp. Do I really need to say more?");
             PlortRegistry.AddPlortEntry(PorpId.PORP_PLORT, new[] { ProgressDirector.ProgressType.NONE });
 
-            //DataModelRegistry.RegisterCustomActorModel(PorpId.PORP_SLIME, )
-
             PediaRegistry.RegisterIdentifiableMapping(PediaDirector.Id.PLORTS, PorpId.PORP_PLORT);
             PediaRegistry.RegisterIdentifiableMapping(PorpId.PORP_SLIMES, PorpId.PORP_SLIME);
             PediaRegistry.SetPediaCategory(PorpId.PORP_SLIMES, PediaRegistry.PediaCategory.SLIMES);
@@ -84,10 +82,10 @@ namespace PorpSlime
 
             SlimeDefinition porpDef = PrefabUtils.DeepCopyObject(pinkSlimeObject) as SlimeDefinition;
             porpDef.AppearancesDefault = new SlimeAppearance[1];
-            porpDef.Diet.Produces = new[] { PorpId.PORP_PLORT };
-            porpDef.Diet.MajorFoodGroups = new[] { SlimeEat.FoodGroup.MEAT };
+            porpDef.Diet.Produces = new Identifiable.Id[0];
+            porpDef.Diet.MajorFoodGroups = new SlimeEat.FoodGroup[0];
             porpDef.Diet.AdditionalFoods = new Identifiable.Id[0];
-            porpDef.Diet.Favorites = new[] { Identifiable.Id.HEN };
+            porpDef.Diet.Favorites = new Identifiable.Id[0];
             porpDef.Diet.EatMap?.Clear();
             porpDef.CanLargofy = false;
             porpDef.FavoriteToys = new Identifiable.Id[0];
@@ -99,55 +97,11 @@ namespace PorpSlime
             porpSlimeObject.GetComponent<PlayWithToys>().slimeDefinition = porpDef;
             porpSlimeObject.GetComponent<SlimeAppearanceApplicator>().SlimeDefinition = porpDef;
             porpSlimeObject.GetComponent<SlimeEat>().slimeDefinition = porpDef;
-            //porpSlimeObject.GetComponent<Rigidbody>().mass = 100f;
-            //porpSlimeObject.GetComponent<Vacuumable>().size = Vacuumable.Size.NORMAL;
             porpSlimeObject.GetComponent<Identifiable>().id = PorpId.PORP_SLIME;
             porpSlimeObject.AddComponent<ForcePorp>();
 
             SlimeAppearance porpSlimeAppearance = PrefabUtils.DeepCopyObject(pinkSlimeObject.AppearancesDefault.First()) as SlimeAppearance;
             porpDef.AppearancesDefault[0] = porpSlimeAppearance;
-            foreach (SlimeAppearanceStructure structure in porpSlimeAppearance.Structures)
-            {
-                Material[] defaultMaterials = structure.DefaultMaterials;
-                if ((defaultMaterials != null ? defaultMaterials.Length : 0) != 0)
-                {
-                    Material material = UnityObject.Instantiate(structure.DefaultMaterials[0]);
-                    material.SetColor(topColorNameId, porpColorTop);
-                    material.SetColor(middleColorNameId, porpColorMid);
-                    material.SetColor(bottomColorNameId, porpColorBot);
-                    material.SetColor("_SpecColor", new Color(0.114f, 0.008f, 0.176f));
-                    //material.SetFloat("_Shininess", 50f);
-                    material.SetFloat("_Gloss", 0f);
-                    structure.DefaultMaterials[0] = material;
-                }
-            }
-            foreach (SlimeExpressionFace expressionFace in porpSlimeAppearance.Face.ExpressionFaces)
-            {
-                if (expressionFace.Mouth)
-                {
-                    expressionFace.Mouth.SetColor("_MouthBot", new Color(0.114f, 0.008f, 0.176f));
-                    expressionFace.Mouth.SetColor("_MouthMid", new Color(0.114f, 0.008f, 0.176f));
-                    expressionFace.Mouth.SetColor("_MouthTop", new Color(0.114f, 0.008f, 0.176f));
-                }
-                if (expressionFace.Eyes)
-                {
-                    expressionFace.Eyes.SetColor("_EyeBlue", new Color(0.114f, 0.008f, 0.176f));
-                    expressionFace.Eyes.SetColor("_EyeGreen", new Color(0.114f, 0.008f, 0.176f));
-                    expressionFace.Eyes.SetColor("_EyeRed", new Color(0.114f, 0.008f, 0.176f));
-                    expressionFace.Eyes.SetColor("_GlowColor", new Color(0.671f, 0.165f, 0.965f));
-                    expressionFace.Eyes.SetFloat("_EnableGlow", 1f);
-                }
-            }
-
-            porpSlimeAppearance.Face.OnEnable();
-            porpSlimeAppearance.ColorPalette = new SlimeAppearance.Palette()
-            {
-                Bottom = porpColorBot,
-                Top = porpColorTop,
-                Middle = porpColorMid
-            };
-            porpDef.AppearancesDefault = new[] { porpSlimeAppearance };
-
 
             UnityObject.Destroy(porpSlimeObject.GetComponent<MaybeCullOnReenable>());
             UnityObject.Destroy(porpSlimeObject.GetComponentInChildren<SlimeEatTrigger>());
@@ -229,20 +183,6 @@ namespace PorpSlime
                 var id = Identifiable.GetId(identifiablePrefab);
                 if (Identifiable.IsSlime(id) && id != PorpId.PORP_SLIME)
                     identifiablePrefab.AddComponent<PorpSpawn>();
-            }
-
-            foreach (SlimeDefinition slime in SRSingleton<GameContext>.Instance.SlimeDefinitions.Slimes)
-            {
-                if (slime.IdentifiableId == PorpId.PORP_SLIME)
-                    {
-                        foreach (var eatmap in slime.Diet.EatMap)
-                        {
-                            eatmap.becomesId = Identifiable.Id.TABBY_SLIME;
-                            eatmap.producesId = Identifiable.Id.NONE;
-                            eatmap.extraDrive = 9999f;
-                        }
-                    }
-
             }
         }
 

@@ -4,8 +4,11 @@ using MonomiPark.SlimeRancher.Regions;
 using SRML.SR.SaveSystem;
 using SRML.SR.SaveSystem.Data;
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -14,7 +17,7 @@ namespace PorpSlime
 {
     public class PorpSpawn : RegisteredActorBehaviour, ExtendedData.Participant
     {
-        internal const float PROBABILITY_PORP = 0.005f;
+        internal const float PROBABILITY_PORP = 0.001f;
         private static int topColorNameId = Shader.PropertyToID("_TopColor");
         private static int middleColorNameId = Shader.PropertyToID("_MiddleColor");
         private static int bottomColorNameId = Shader.PropertyToID("_BottomColor");
@@ -44,8 +47,6 @@ namespace PorpSlime
         internal Color testmid = Color.blue;
         internal Color testbot = Color.green;
         private bool didGetSet;
-        public static Skin DefaultSkin = Skin.Normal;
-
 
         private static SlimeDiet _porpDiet = null;
         private static SlimeDefinition _porpSlimeDef = new SlimeDefinition()
@@ -66,18 +67,11 @@ namespace PorpSlime
         {
             slimeEat = GetComponent<SlimeEat>();
             consumable = GetComponent<GotoConsumable>();
+            UpdateSkin();
+        }
 
-            switch (DefaultSkin)
-            {
-                case Skin.Porp:
-                    skin = Skin.Porp;
-                    Shinify();
-                    didGetSet = true;
-                    break;
-            }
-
-            DefaultSkin = Skin.Normal;
-
+        private void UpdateSkin()
+        {
             if (!didGetSet && !Identifiable.IsLargo(Identifiable.GetId(gameObject)) && Identifiable.GetId(gameObject) != Identifiable.Id.TARR_SLIME)
             {
                 skin = ShinyCheck();
@@ -86,21 +80,24 @@ namespace PorpSlime
             switch (skin)
             {
                 case Skin.Porp:
-                    Shinify();
+                    Porpify();
                     break;
             }
+        }
+
+        public void SetAll(PorpSpawn other)
+        {
+            Debug.Log("SetAll called");
+            skin = other.skin;
+            didGetSet = other.didGetSet;
+            UpdateSkin();
         }
 
         public void SetSkin(Skin skin)
         {
             this.skin = skin;
             didGetSet = true;
-            switch (skin)
-            {
-                case Skin.Porp:
-                    Shinify();
-                    break;
-            }
+            UpdateSkin();
         }
 
         public void ReadData(CompoundDataPiece piece)
@@ -196,7 +193,7 @@ namespace PorpSlime
             }
         }
 
-        public void Shinify()
+        public void Porpify()
         {
             SetDiet();
             switch (Identifiable.GetId(gameObject))
@@ -237,13 +234,43 @@ namespace PorpSlime
         [HarmonyPatch("EatAndTransform")]
         public static class PorpPersistance
         {
-            public static void Prefix(SlimeEat __instance)
+
+            static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
             {
-                Identifiable.Id id = Identifiable.GetId(__instance.gameObject);
-                var idName = Enum.GetName(typeof(Identifiable.Id), id);
-                DefaultSkin = __instance.gameObject.GetComponent<PorpSpawn>().skin;
-                var skinName = Enum.GetName(typeof(Skin), DefaultSkin);
-                Debug.Log($"Transforming {idName} with {skinName} skin");
+                var codes = new List<CodeInstruction>(instructions);
+
+                int index = -1;
+
+                for (var i = 0; i < codes.Count - 1; i++)
+                {
+                    if (codes[i].opcode == OpCodes.Ldloc_1 && codes[i + 1].opcode == OpCodes.Callvirt &&
+                        ((MethodInfo)codes[i + 1].operand).Name == "GetComponent" &&
+                         ((MethodInfo)codes[i + 1].operand).GetGenericArguments().SequenceEqual(new[] { typeof(OnTransformed) }))
+                    {
+                        index = i;
+                        break;
+                    }
+                }
+
+                codes.InsertRange(index, new[]
+                {
+                    new CodeInstruction(OpCodes.Ldarg_0), // this
+                    new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(Component), "get_gameObject")),
+                    new CodeInstruction(OpCodes.Ldloc_1), // Local gameObject
+                    new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(PorpPersistance), nameof(CopyPorp)))
+                });
+
+                return codes;
+            }
+            static void CopyPorp(GameObject orig, GameObject newObj)
+            {
+                var origPorp = orig.GetComponent<PorpSpawn>();
+                var newPorp = newObj.GetComponent<PorpSpawn>();
+
+                if (origPorp != null && newPorp != null)
+                {
+                    newPorp.SetAll(origPorp);
+                }
             }
         }
     }
