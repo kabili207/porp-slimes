@@ -82,6 +82,7 @@
     <Compile Include="ForcePorp.cs" />
     <Compile Include="GetIdentifiableTargetPatch.cs" />
     <Compile Include="GetProducePatch.cs" />
+    <Compile Include="IncineratePatch.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="PorpId.cs" />
     <Compile Include="PorpSpawn.cs" />

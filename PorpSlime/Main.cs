@@ -114,6 +114,7 @@ namespace PorpSlime
             GameObject porpPlortObject = PrefabUtils.CopyPrefab(firePlortObject);
             porpPlortObject.GetComponent<Identifiable>().id = PorpId.PORP_PLORT;
             porpPlortObject.name = "porpPlort";
+            UnityObject.DestroyImmediate(porpPlortObject.GetComponent<DestroyOnIgnite>());
 
             Material porpPlortMaterial = UnityObject.Instantiate(firePlortMaterial);
             porpPlortMaterial.SetColor(topColorNameId, porpColorMid);
