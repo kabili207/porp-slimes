@@ -166,11 +166,23 @@ namespace PorpSlime
         // Used for editing existing assets in the game, not a registry step
         public override void PostLoad()
         {
-            foreach (GameObject identifiablePrefab in SRSingleton<GameContext>.Instance.LookupDirector.identifiablePrefabs)
+            foreach (SlimeDefinition slime in SRSingleton<GameContext>.Instance.SlimeDefinitions.Slimes)
             {
-                var id = Identifiable.GetId(identifiablePrefab);
+                var id = slime.IdentifiableId;
+
+                slime.Diet.EatMap.Add(new SlimeDiet.EatMapEntry()
+                {
+                    eats = Identifiable.Id.INDIGONIUM_CRAFT,
+                    becomesId = Identifiable.Id.NONE,
+                    producesId = Identifiable.Id.NONE,
+                    driver = SlimeEmotions.Emotion.AGITATION,
+                    extraDrive = 1f,
+                    isFavorite = false,
+                    minDrive = 0.1f
+                });
+
                 if (Identifiable.IsSlime(id) && id != Id.PORP_SLIME)
-                    identifiablePrefab.AddComponent<PorpSpawn>();
+                    slime.BaseModule.AddComponent<PorpSpawn>();
             }
         }
 

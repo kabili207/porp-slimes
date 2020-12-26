@@ -79,6 +79,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Patches\FinishChompPatch.cs" />
     <Compile Include="ForcePorp.cs" />
     <Compile Include="Patches\GetIdentifiableTargetPatch.cs" />
     <Compile Include="Patches\GetProducePatch.cs" />

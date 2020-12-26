@@ -17,7 +17,7 @@ namespace PorpSlime
 {
     public class PorpSpawn : RegisteredActorBehaviour, ExtendedData.Participant
     {
-        internal const float PROBABILITY_PORP = 0.001f;
+        internal const float PROBABILITY_PORP = 0.005f;
         private static int topColorNameId = Shader.PropertyToID("_TopColor");
         private static int middleColorNameId = Shader.PropertyToID("_MiddleColor");
         private static int bottomColorNameId = Shader.PropertyToID("_BottomColor");
@@ -56,6 +56,7 @@ namespace PorpSlime
         };
         private SlimeEat slimeEat;
         private GotoConsumable consumable;
+        private RegionMember regionMember;
 
         public enum Skin
         {
@@ -67,6 +68,7 @@ namespace PorpSlime
         {
             slimeEat = GetComponent<SlimeEat>();
             consumable = GetComponent<GotoConsumable>();
+            regionMember = GetComponent<RegionMember>();
             UpdateSkin();
         }
 
@@ -142,7 +144,7 @@ namespace PorpSlime
         {
             Identifiable.Id id = Identifiable.GetId(gameObject);
 
-            if (Randoms.SHARED.GetProbability(PROBABILITY_PORP) && id != Id.PORP_SLIME)
+            if (regionMember.IsInZone(ZoneDirector.Zone.QUARRY) && Randoms.SHARED.GetProbability(PROBABILITY_PORP) && id != Id.PORP_SLIME)
                 return Skin.Porp;
             return Skin.Normal;
         }
