@@ -46,9 +46,9 @@ namespace PorpSlime
             //SystemContext.IsModded = true;
             SRML.Console.Console.RegisterCommand(new SpawnPorpCommand());
 
-            TranslationPatcher.AddActorTranslation("l." + PorpId.PORP_SLIME.ToString().ToLower(), "Porp Slime");
-            TranslationPatcher.AddActorTranslation("l." + PorpId.PORP_PLORT.ToString().ToLower(), "Porp Plort");
-            new SlimePediaEntryTranslation(PorpId.PORP_SLIMES).SetTitleTranslation("Porp Slimes")
+            TranslationPatcher.AddActorTranslation("l." + Id.PORP_SLIME.ToString().ToLower(), "Porp Slime");
+            TranslationPatcher.AddActorTranslation("l." + Id.PORP_PLORT.ToString().ToLower(), "Porp Plort");
+            new SlimePediaEntryTranslation(Id.PORP_SLIMES).SetTitleTranslation("Porp Slimes")
                 .SetIntroTranslation("More porp than your body has room for!")
                 .SetSlimeologyTranslation(
                     "Porp porp porple porp porp porp porp porp porp porp porp porp porple. " +
@@ -61,11 +61,11 @@ namespace PorpSlime
                     "overwhelmed with all of the porp.")
                 .SetPlortonomicsTranslation(
                     "Look, it's porp. Everyone wants porp. Do I really need to say more?");
-            PlortRegistry.AddPlortEntry(PorpId.PORP_PLORT, new[] { ProgressDirector.ProgressType.NONE });
+            PlortRegistry.AddPlortEntry(Id.PORP_PLORT, new[] { ProgressDirector.ProgressType.NONE });
 
-            PediaRegistry.RegisterIdentifiableMapping(PediaDirector.Id.PLORTS, PorpId.PORP_PLORT);
-            PediaRegistry.RegisterIdentifiableMapping(PorpId.PORP_SLIMES, PorpId.PORP_SLIME);
-            PediaRegistry.SetPediaCategory(PorpId.PORP_SLIMES, PediaRegistry.PediaCategory.SLIMES);
+            PediaRegistry.RegisterIdentifiableMapping(PediaDirector.Id.PLORTS, Id.PORP_PLORT);
+            //PediaRegistry.RegisterIdentifiableMapping(PorpId.PORP_SLIMES, PorpId.PORP_SLIME);
+            PediaRegistry.SetPediaCategory(Id.PORP_SLIMES, PediaRegistry.PediaCategory.SLIMES);
 
             TranslationPatcher.AddTranslationKey("pedia", PORP_TOY_KEY, "Porp Lantern");
             TranslationPatcher.AddTranslationKey("pedia", PORP_TOY_UI_KEY, "Porp Lantern");
@@ -90,14 +90,14 @@ namespace PorpSlime
             porpDef.CanLargofy = false;
             porpDef.FavoriteToys = new Identifiable.Id[0];
             porpDef.Name = "Porp";
-            porpDef.IdentifiableId = PorpId.PORP_SLIME;
+            porpDef.IdentifiableId = Id.PORP_SLIME;
 
             GameObject porpSlimeObject = PrefabUtils.CopyPrefab(SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Identifiable.Id.TABBY_SLIME));
             porpSlimeObject.name = "porpSlime";
             porpSlimeObject.GetComponent<PlayWithToys>().slimeDefinition = porpDef;
             porpSlimeObject.GetComponent<SlimeAppearanceApplicator>().SlimeDefinition = porpDef;
             porpSlimeObject.GetComponent<SlimeEat>().slimeDefinition = porpDef;
-            porpSlimeObject.GetComponent<Identifiable>().id = PorpId.PORP_SLIME;
+            porpSlimeObject.GetComponent<Identifiable>().id = Id.PORP_SLIME;
             porpSlimeObject.AddComponent<ForcePorp>();
 
             SlimeAppearance porpSlimeAppearance = PrefabUtils.DeepCopyObject(pinkSlimeObject.AppearancesDefault.First()) as SlimeAppearance;
@@ -112,7 +112,7 @@ namespace PorpSlime
             Material firePlortMaterial = firePlortObject.GetComponentInChildren<MeshRenderer>().material;
 
             GameObject porpPlortObject = PrefabUtils.CopyPrefab(firePlortObject);
-            porpPlortObject.GetComponent<Identifiable>().id = PorpId.PORP_PLORT;
+            porpPlortObject.GetComponent<Identifiable>().id = Id.PORP_PLORT;
             porpPlortObject.name = "porpPlort";
             UnityObject.DestroyImmediate(porpPlortObject.GetComponent<DestroyOnIgnite>());
 
@@ -126,12 +126,12 @@ namespace PorpSlime
 
             LookupRegistry.RegisterIdentifiablePrefab(porpPlortObject);
 
-            RegisterFullVaccable(PorpId.PORP_SLIME, porpColor, GetSprite(assetBundle, "iconSlimePorp"));
-            RegisterFullVaccable(PorpId.PORP_PLORT, porpColor, GetSprite(assetBundle, "iconPlortPorp"));
+            RegisterFullVaccable(Id.PORP_SLIME, porpColor, GetSprite(assetBundle, "iconSlimePorp"));
+            RegisterFullVaccable(Id.PORP_PLORT, porpColor, GetSprite(assetBundle, "iconPlortPorp"));
 
-            PediaRegistry.RegisterIdEntry(PorpId.PORP_SLIMES, GetSprite(assetBundle, "iconSlimePorp"));
-            PlortRegistry.AddEconomyEntry(PorpId.PORP_PLORT, 600f, 999f);
-            DroneRegistry.RegisterBasicTarget(PorpId.PORP_PLORT);
+            PediaRegistry.RegisterIdEntry(Id.PORP_SLIMES, GetSprite(assetBundle, "iconSlimePorp"));
+            PlortRegistry.AddEconomyEntry(Id.PORP_PLORT, 600f, 999f);
+            DroneRegistry.RegisterBasicTarget(Id.PORP_PLORT);
 
             /*
             GameObject gameObject7 = PrefabUtils.CopyPrefab(SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Identifiable.Id.NIGHT_LIGHT_TOY));
@@ -162,19 +162,6 @@ namespace PorpSlime
             //UPGRADED_TOYS.Add(PorpId.PORP_LANTERN);
         }
 
-        private static T CreateObject<T>(object anon) where T : ScriptableObject
-        {
-            Type objType = typeof(T);
-            T createdObject = (T)Activator.CreateInstance(objType);
-            var properties = anon.GetType().GetProperties();
-            foreach (var property in properties)
-            {
-                var field = objType.GetField(property.Name, BindingFlags.NonPublic);
-                field.SetValue(createdObject, property.GetValue(anon));
-            }
-            return createdObject;
-        }
-
         // Called after all mods Load's have been called
         // Used for editing existing assets in the game, not a registry step
         public override void PostLoad()
@@ -182,7 +169,7 @@ namespace PorpSlime
             foreach (GameObject identifiablePrefab in SRSingleton<GameContext>.Instance.LookupDirector.identifiablePrefabs)
             {
                 var id = Identifiable.GetId(identifiablePrefab);
-                if (Identifiable.IsSlime(id) && id != PorpId.PORP_SLIME)
+                if (Identifiable.IsSlime(id) && id != Id.PORP_SLIME)
                     identifiablePrefab.AddComponent<PorpSpawn>();
             }
         }

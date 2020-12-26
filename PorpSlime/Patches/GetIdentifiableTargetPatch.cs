@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace PorpSlime
+namespace PorpSlime.Patches
 {
     [HarmonyPatch(typeof(TargetingUI), "GetIdentifiableTarget")]
     internal static class GetIdentifiableTargetPatch

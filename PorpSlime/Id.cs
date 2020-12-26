@@ -8,11 +8,12 @@ using System.Threading.Tasks;
 namespace PorpSlime
 {
     [EnumHolder]
-    public static class PorpId
+    public static class Id
     {
         public static readonly PediaDirector.Id PORP_SLIMES;
         public static readonly Identifiable.Id PORP_SLIME;
         public static readonly Identifiable.Id PORP_PLORT;
-        public static readonly Identifiable.Id PORP_LANTERN;
+        public static readonly Identifiable.Id TRANS_BALL;
+        public static readonly Identifiable.Id PASTEL_POTION;
     }
 }

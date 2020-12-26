@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace PorpSlime
+namespace PorpSlime.Patches
 {
     // The version of Harmony that SRML uses doesn't support multiple prefix/postfix definitions in the same class,
     // So we make several nested classes instead
@@ -40,7 +40,7 @@ namespace PorpSlime
                 int num = __result != null ? __result.Count(new Func<Identifiable.Id, bool>(Identifiable.IsPlort)) : 0;
                 __result.Clear();
                 for (int index = 0; index < num; ++index)
-                    __result.Add(PorpId.PORP_PLORT);
+                    __result.Add(Id.PORP_PLORT);
             }
         }
     }
@@ -72,9 +72,9 @@ namespace PorpSlime
                 PorpSpawn spawn = __instance.GetComponent<PorpSpawn>();
                 Identifiable.Id id = Identifiable.GetId(produces);
 
-                if (id == PorpId.PORP_PLORT || !Identifiable.IsPlort(id) || spawn is null || spawn.skin != PorpSpawn.Skin.Porp)
+                if (id == Id.PORP_PLORT || !Identifiable.IsPlort(id) || spawn is null || spawn.skin != PorpSpawn.Skin.Porp)
                     return;
-                produces = SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(PorpId.PORP_PLORT);
+                produces = SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Id.PORP_PLORT);
             }
         }
     }

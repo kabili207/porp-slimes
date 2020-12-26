@@ -127,7 +127,7 @@ namespace PorpSlime
             {
                 _porpDiet = new SlimeDiet()
                 {
-                    Produces = new[] { PorpId.PORP_PLORT },
+                    Produces = new[] { Id.PORP_PLORT },
                     MajorFoodGroups = new[] { SlimeEat.FoodGroup.MEAT },
                     AdditionalFoods = new Identifiable.Id[0],
                     Favorites = new[] { Identifiable.Id.HEN },
@@ -141,7 +141,8 @@ namespace PorpSlime
         private Skin ShinyCheck()
         {
             Identifiable.Id id = Identifiable.GetId(gameObject);
-            if (Randoms.SHARED.GetProbability(PROBABILITY_PORP) && id != PorpId.PORP_SLIME)
+
+            if (Randoms.SHARED.GetProbability(PROBABILITY_PORP) && id != Id.PORP_SLIME)
                 return Skin.Porp;
             return Skin.Normal;
         }
