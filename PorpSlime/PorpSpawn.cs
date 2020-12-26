@@ -144,7 +144,7 @@ namespace PorpSlime
         {
             Identifiable.Id id = Identifiable.GetId(gameObject);
 
-            if (regionMember.IsInZone(ZoneDirector.Zone.QUARRY) && Randoms.SHARED.GetProbability(PROBABILITY_PORP) && id != Id.PORP_SLIME)
+            if (regionMember.IsInZone(ZoneDirector.Zone.QUARRY) && Randoms.SHARED.GetProbability(PROBABILITY_PORP))
                 return Skin.Porp;
             return Skin.Normal;
         }

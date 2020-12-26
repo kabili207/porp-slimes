@@ -46,7 +46,6 @@ namespace PorpSlime
             //SystemContext.IsModded = true;
             SRML.Console.Console.RegisterCommand(new SpawnPorpCommand());
 
-            TranslationPatcher.AddActorTranslation("l." + Id.PORP_SLIME.ToString().ToLower(), "Porp Slime");
             TranslationPatcher.AddActorTranslation("l." + Id.PORP_PLORT.ToString().ToLower(), "Porp Plort");
             new SlimePediaEntryTranslation(Id.PORP_SLIMES).SetTitleTranslation("Porp Slimes")
                 .SetIntroTranslation("More porp than your body has room for!")
@@ -78,36 +77,6 @@ namespace PorpSlime
         // Used for registering things that require a loaded gamecontext
         public override void Load()
         {
-            var pinkSlimeObject = SRSingleton<GameContext>.Instance.SlimeDefinitions.GetSlimeByIdentifiableId(Identifiable.Id.TABBY_SLIME);
-
-            SlimeDefinition porpDef = PrefabUtils.DeepCopyObject(pinkSlimeObject) as SlimeDefinition;
-            porpDef.AppearancesDefault = new SlimeAppearance[1];
-            porpDef.Diet.Produces = new Identifiable.Id[0];
-            porpDef.Diet.MajorFoodGroups = new SlimeEat.FoodGroup[0];
-            porpDef.Diet.AdditionalFoods = new Identifiable.Id[0];
-            porpDef.Diet.Favorites = new Identifiable.Id[0];
-            porpDef.Diet.EatMap?.Clear();
-            porpDef.CanLargofy = false;
-            porpDef.FavoriteToys = new Identifiable.Id[0];
-            porpDef.Name = "Porp";
-            porpDef.IdentifiableId = Id.PORP_SLIME;
-
-            GameObject porpSlimeObject = PrefabUtils.CopyPrefab(SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Identifiable.Id.TABBY_SLIME));
-            porpSlimeObject.name = "porpSlime";
-            porpSlimeObject.GetComponent<PlayWithToys>().slimeDefinition = porpDef;
-            porpSlimeObject.GetComponent<SlimeAppearanceApplicator>().SlimeDefinition = porpDef;
-            porpSlimeObject.GetComponent<SlimeEat>().slimeDefinition = porpDef;
-            porpSlimeObject.GetComponent<Identifiable>().id = Id.PORP_SLIME;
-            porpSlimeObject.AddComponent<ForcePorp>();
-
-            SlimeAppearance porpSlimeAppearance = PrefabUtils.DeepCopyObject(pinkSlimeObject.AppearancesDefault.First()) as SlimeAppearance;
-            porpDef.AppearancesDefault[0] = porpSlimeAppearance;
-
-            UnityObject.Destroy(porpSlimeObject.GetComponent<MaybeCullOnReenable>());
-            UnityObject.Destroy(porpSlimeObject.GetComponentInChildren<SlimeEatTrigger>());
-            LookupRegistry.RegisterIdentifiablePrefab(porpSlimeObject);
-            SlimeRegistry.RegisterSlimeDefinition(porpDef);
-
             GameObject firePlortObject = SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Identifiable.Id.PINK_PLORT);
             Material firePlortMaterial = firePlortObject.GetComponentInChildren<MeshRenderer>().material;
 
@@ -126,7 +95,6 @@ namespace PorpSlime
 
             LookupRegistry.RegisterIdentifiablePrefab(porpPlortObject);
 
-            RegisterFullVaccable(Id.PORP_SLIME, porpColor, GetSprite(assetBundle, "iconSlimePorp"));
             RegisterFullVaccable(Id.PORP_PLORT, porpColor, GetSprite(assetBundle, "iconPlortPorp"));
 
             PediaRegistry.RegisterIdEntry(Id.PORP_SLIMES, GetSprite(assetBundle, "iconSlimePorp"));
@@ -181,7 +149,7 @@ namespace PorpSlime
                     minDrive = 0.1f
                 });
 
-                if (Identifiable.IsSlime(id) && id != Id.PORP_SLIME)
+                if (Identifiable.IsSlime(id))
                     slime.BaseModule.AddComponent<PorpSpawn>();
             }
         }
