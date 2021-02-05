@@ -79,6 +79,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Patches\ConsumeVacItemPatch.cs" />
     <Compile Include="Patches\FinishChompPatch.cs" />
     <Compile Include="ForcePorp.cs" />
     <Compile Include="Patches\GetIdentifiableTargetPatch.cs" />
@@ -94,7 +95,18 @@
     <EmbeddedResource Include="modinfo.json" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="porp" />
+    <None Include="UnityAssets\Linux\Linux" />
+    <None Include="UnityAssets\Linux\Linux.manifest" />
+    <EmbeddedResource Include="UnityAssets\Linux\porp" />
+    <None Include="UnityAssets\Linux\porp.manifest" />
+    <None Include="UnityAssets\OSX\OSX" />
+    <None Include="UnityAssets\OSX\OSX.manifest" />
+    <EmbeddedResource Include="UnityAssets\OSX\porp" />
+    <None Include="UnityAssets\OSX\porp.manifest" />
+    <EmbeddedResource Include="UnityAssets\Windows\porp" />
+    <None Include="UnityAssets\Windows\porp.manifest" />
+    <None Include="UnityAssets\Windows\Windows" />
+    <None Include="UnityAssets\Windows\Windows.manifest" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />

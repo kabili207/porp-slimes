@@ -10,13 +10,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityObject = UnityEngine.Object;
-using IL = InlineIL.IL.Emit;
-using System.CodeDom;
-using SRML.SR.Templates;
 
 namespace PorpSlime
 {
@@ -26,9 +24,9 @@ namespace PorpSlime
         private static int middleColorNameId = Shader.PropertyToID("_MiddleColor");
         private static int bottomColorNameId = Shader.PropertyToID("_BottomColor");
 
-        private const string PORP_TOY_KEY = "t.porp_toy";
-        private const string PORP_TOY_UI_KEY = "m.toy.name.t.porp_toy";
-        private const string PORP_TOY_DESC_KEY = "m.toy.desc.t.porp_toy";
+        private const string PORP_TOY_KEY = "t.trans_toy";
+        private const string PORP_TOY_UI_KEY = "m.toy.name.t.trans_toy";
+        private const string PORP_TOY_DESC_KEY = "m.toy.desc.t.trans_toy";
 
         private static readonly Color porpColor = new Color(0.40f, 0.04f, 0.592f);
 
@@ -47,6 +45,8 @@ namespace PorpSlime
             SRML.Console.Console.RegisterCommand(new SpawnPorpCommand());
 
             TranslationPatcher.AddActorTranslation("l." + Id.PORP_PLORT.ToString().ToLower(), "Porp Plort");
+            TranslationPatcher.AddActorTranslation("l." + Id.TRANS_BALL.ToString().ToLower(), "Colorful Ball");
+            TranslationPatcher.AddActorTranslation("l." + Id.PASTEL_POTION.ToString().ToLower(), "Pastel Potion");
             new SlimePediaEntryTranslation(Id.PORP_SLIMES).SetTitleTranslation("Porp Slimes")
                 .SetIntroTranslation("More porp than your body has room for!")
                 .SetSlimeologyTranslation(
@@ -63,12 +63,11 @@ namespace PorpSlime
             PlortRegistry.AddPlortEntry(Id.PORP_PLORT, new[] { ProgressDirector.ProgressType.NONE });
 
             PediaRegistry.RegisterIdentifiableMapping(PediaDirector.Id.PLORTS, Id.PORP_PLORT);
-            //PediaRegistry.RegisterIdentifiableMapping(PorpId.PORP_SLIMES, PorpId.PORP_SLIME);
             PediaRegistry.SetPediaCategory(Id.PORP_SLIMES, PediaRegistry.PediaCategory.SLIMES);
 
-            TranslationPatcher.AddTranslationKey("pedia", PORP_TOY_KEY, "Porp Lantern");
-            TranslationPatcher.AddTranslationKey("pedia", PORP_TOY_UI_KEY, "Porp Lantern");
-            TranslationPatcher.AddTranslationKey("pedia", PORP_TOY_DESC_KEY, "It's porple glow can calm even the angriest of porps.");
+            TranslationPatcher.AddTranslationKey("pedia", PORP_TOY_KEY, "Colorful Ball");
+            TranslationPatcher.AddTranslationKey("pedia", PORP_TOY_UI_KEY, "Colorful Ball");
+            TranslationPatcher.AddTranslationKey("pedia", PORP_TOY_DESC_KEY, "It's unknown why, but porp slimes absolutely love the pastel blues and pinks colorful ball.");
 
         }
 
@@ -91,23 +90,38 @@ namespace PorpSlime
             porpPlortMaterial.SetColor(bottomColorNameId, porpColorMid);
             porpPlortObject.GetComponentInChildren<MeshRenderer>().material = porpPlortMaterial;
 
-            AssetBundle assetBundle = AssetBundle.LoadFromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream(typeof(Main), "porp"));
+            AssetBundle assetBundle = GetAssetBundle("porp");
 
             LookupRegistry.RegisterIdentifiablePrefab(porpPlortObject);
 
             RegisterFullVaccable(Id.PORP_PLORT, porpColor, GetSprite(assetBundle, "iconPlortPorp"));
 
             PediaRegistry.RegisterIdEntry(Id.PORP_SLIMES, GetSprite(assetBundle, "iconSlimePorp"));
-            PlortRegistry.AddEconomyEntry(Id.PORP_PLORT, 600f, 999f);
+            PlortRegistry.AddEconomyEntry(Id.PORP_PLORT, 600f, 300f);
             DroneRegistry.RegisterBasicTarget(Id.PORP_PLORT);
 
-            /*
-            GameObject gameObject7 = PrefabUtils.CopyPrefab(SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Identifiable.Id.NIGHT_LIGHT_TOY));
-            gameObject7.AddComponent<Identifiable>().id = PorpId.PORP_LANTERN;
+
+
+
+            Material pastelPotionMat = assetBundle.LoadAsset<Material>("pastelPotionMat");
+            //Material pastelPotionCapMat = assetBundle.LoadAsset<Material>("SlimeySolutionCapMat");
+
+            GameObject b3 = PrefabUtils.CopyPrefab(SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Identifiable.Id.PRIMORDY_OIL_CRAFT));
+            b3.GetComponent<Identifiable>().id = Id.PASTEL_POTION;
+            b3.name = "resourcePastelPotion";
+            b3.transform.GetChild(0).GetChild(1).GetChild(0).gameObject.GetComponent<MeshRenderer>().material = pastelPotionMat;
+            //b3.transform.GetChild(0).gameObject.GetComponent<MeshRenderer>().material = pastelPotionCapMat;
+            LookupRegistry.RegisterIdentifiablePrefab(b3);
+            RegisterFullVaccable(Id.PASTEL_POTION, porpColor, GetSprite(assetBundle, "trans_flag"));
+
+
+            GameObject gameObject7 = PrefabUtils.CopyPrefab(SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Identifiable.Id.BEACH_BALL_TOY));
+            gameObject7.AddComponent<Identifiable>().id = Id.TRANS_BALL;
+            gameObject7.name = "transToy";
             //UnityObject.DestroyImmediate(gameObject7.GetComponent<GadgetPortableSlimeBaitPlaySoundOnHit>());
             //gameObject7.layer = LayerMask.NameToLayer("Actor");
             //gameObject7.transform.localScale *= 0.6f;
-            gameObject7.AddComponent<RegionMember>();
+            /*gameObject7.AddComponent<RegionMember>();
             gameObject7.AddComponent<DragFloatReactor>();
             gameObject7.AddComponent<Vacuumable>().size = Vacuumable.Size.LARGE;
             gameObject7.AddComponent<CollisionAggregator>();
@@ -116,18 +130,41 @@ namespace PorpSlime
             gameObject8.AddComponent<VacDelaunchTrigger>();
             gameObject8.AddComponent<SphereCollider>().radius = gameObject7.GetComponent<SphereCollider>().radius;
             gameObject8.GetComponent<SphereCollider>().isTrigger = true;
-            gameObject8.AddComponent<ToyProximityTrigger>();
-            ToyDefinition toyDefinition = CreateObject<ToyDefinition>(new
+            gameObject8.AddComponent<ToyProximityTrigger>();*/
+            ToyDefinition toyDefinition = new ToyDefinition()
             {
                 cost = 900,
-                icon = GetSprite(assetBundle, "iconSlimePorp"),
-                nameKey = "porp_toy",
-                toyId = PorpId.PORP_LANTERN
-            });
+                icon = GetSprite(assetBundle, "trans_flag"),
+                nameKey = "trans_toy",
+                toyId = Id.TRANS_BALL
+            };
             LookupRegistry.RegisterIdentifiablePrefab(gameObject7);
-            LookupRegistry.RegisterToy(toyDefinition);*/
-            //var UPGRADED_TOYS = (List<Identifiable.Id>)(typeof(ToyDirector).GetField("UPGRADED_TOYS", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null));
-            //UPGRADED_TOYS.Add(PorpId.PORP_LANTERN);
+            LookupRegistry.RegisterToy(toyDefinition);
+            LookupRegistry.RegisterVacEntry(Id.TRANS_BALL, porpColor, GetSprite(assetBundle, "trans_flag"));
+            //ToyDirector.UPGRADED_TOYS.Add(PorpId.TRANS_BALL);
+        }
+
+        private static AssetBundle GetAssetBundle(string bundleName)
+        {
+            string resourceName;
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                resourceName = $"UnityAssets.Windows.{bundleName}";
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                resourceName = $"UnityAssets.Linux.{bundleName}";
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                resourceName = $"UnityAssets.OSX.{bundleName}";
+            }
+            else
+            {
+                throw new Exception("Unsupported platform detected");
+            }
+
+            return AssetBundle.LoadFromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream(typeof(Main), resourceName));
         }
 
         // Called after all mods Load's have been called

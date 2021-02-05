@@ -1,0 +1,40 @@
+ManifestFileVersion: 0
+CRC: 526032772
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: c286cea1c9f1b8d2273659f84733a116
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 3015f20928c0441831095f66b0f06f70
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 23
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 33
+  Script: {instanceID: 0}
+- Class: 43
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 135
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+Assets:
+- Assets/Sprites/trans_flag_tile2.png
+- Assets/Sprites/trans_flag.png
+- Assets/Sprites/iconSlimePorp.png
+- Assets/Sprites/iconPediaPorp.png
+- Assets/Sprites/iconPlortPorp.png
+- Assets/Materials/transMaterial.mat
+- Assets/transPrefab.prefab
+Dependencies: []
